@@ -1,39 +1,36 @@
 const express = require('express');
 const cors = require('cors');
-const mongoose = require('mongoose'); // Import Mongoose
+const mongoose = require('mongoose');
 
 const app = express();
 app.use(cors());
-app.use(express.json()); // Allow server to read JSON data sent from frontend
+app.use(express.json());
 
-// 1. Connect to MongoDB (It will create a database named 'goal-tracker')
-mongoose.connect('mongodb://localhost:27017/goal-tracker')
+// FIXED CONNECTION LINE:
+mongoose.connect('mongodb+srv://admin:admin2026@cluster0.p7vhjao.mongodb.net/?appName=Cluster0')
     .then(() => console.log('Connected to MongoDB!'))
     .catch((err) => console.error('Failed to connect to MongoDB', err));
 
-// 2. Define the "Schema" (What a Goal looks like)
+// Schema
 const goalSchema = new mongoose.Schema({
     text: String
 });
-
 const Goal = mongoose.model('Goal', goalSchema);
 
-// 3. Route to GET all goals from the database
+// Routes
 app.get('/goals', async (req, res) => {
-    const goals = await Goal.find(); // Ask database for all goals
+    const goals = await Goal.find();
     res.json(goals);
 });
 
-// 4. Route to CREATE a new goal
 app.post('/goals', async (req, res) => {
     const newGoal = new Goal({ text: req.body.text });
-    await newGoal.save(); // Save to database
+    await newGoal.save();
     res.json(newGoal);
 });
 
-// 5. Route to DELETE a goal
 app.delete('/goals/:id', async (req, res) => {
-    await Goal.findByIdAndDelete(req.params.id); // Find the specific ID and delete it
+    await Goal.findByIdAndDelete(req.params.id);
     res.json({ message: "Goal deleted" });
 });
 
